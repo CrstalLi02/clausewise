@@ -26,7 +26,7 @@ def test_parse_markdown(tmp_path):
 
 def test_cleaner_fullwidth():
     cleaner = TextCleaner()
-    assert cleaner.clean_text("Full-width：１２３") == "Full-width:123"
+    assert cleaner.clean_text("Full-width\uff1a\uff11\uff12\uff13") == "Full-width:123"
 
 
 def test_cleaner_removes_noise():

@@ -1,209 +1,124 @@
-# Clausewise：Document Processing and Q&A Assistant
+# Clausewise
 
-An intelligent processing and Q&A system for official policy documents in any multi-department organization — companies, government agencies, hospitals, universities, and more. The bundled demo dataset uses a university as an example (Academic Affairs, Student Affairs, Finance, Human Resources, Logistics, Graduate School, etc.); departments, documents, and glossary are fully configurable.
+**A policy document Q&A assistant for multi-department organizations.**
 
-It covers the full loop of **"document ingestion → intelligent Q&A → self-evolution"**: automatic document parsing and ingestion, multi-agent collaborative Q&A with precise source tracing, Loop Engineering self-evolution (automatically accumulating Skills/Hooks/Rules), and per-department elastic scaling on K8s.
+Clausewise ingests official policy documents from every department, answers questions with clause-level citations, and improves itself from user feedback. It works for any organization with many departments — companies, government agencies, hospitals, or universities.
 
-## Key Features
+## Features
 
-- **Document ingestion**: async parsing of PDF/DOCX/Markdown/HTML/TXT, clause-level chunking, version chains, and automatic cross-department conflict detection.
-- **Trusted Q&A**: automatic department routing, hybrid BM25 + vector retrieval with reranking, `[Source N]` citations, and an independent Verifier that rejects unsupported answers.
-- **Governed memory**: one authoritative fact plane plus five memory planes, with consent, sensitive-data filtering, and auditing.
-- **Self-evolving Loop**: feedback becomes Skills/Hooks/Rules that change retrieval and answers, rolled out via canary experiments with automatic rollback.
-- **Human review**: auto-generated test questions per document; departments exit human review once accuracy stays above the threshold, with spot checks.
-- **Roles and security**: user / department admin / super admin, token-based identity, and strict per-department data isolation.
-- **Scaling**: each department agent scales independently on Kubernetes (HPA), with graceful fallbacks when models are unavailable.
+- **Document ingestion**: parses PDF, DOCX, Markdown, HTML, and TXT asynchronously, splits them by clause, keeps version history, and flags conflicting rules across departments.
+- **Trusted answers**: routes each question to the right department, uses hybrid BM25 + vector retrieval with reranking, cites sources as `[Source N]`, and verifies every answer before returning it.
+- **Self-improving Loop**: user feedback is turned into Skills, Hooks, and Rules that change future answers, released through canary experiments with automatic rollback.
+- **Human review**: auto-generated test questions let department admins check quality; human review is phased out once accuracy stays high.
+- **Governed memory**: official documents are the single source of truth; user memory requires consent and filters sensitive data.
+- **Role-based access**: users, department admins, and super admins, with strict per-department data isolation.
+- **Elastic scaling**: each department agent scales independently on Kubernetes.
 
-> For the detailed technical design, see [`design_files/Clausewise-Technical-Design-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md`](design_files/Clausewise-Technical-Design-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md)
-
-## Architecture (separated frontend/backend + modular services)
+## Architecture
 
 ```
-┌────────────┐   REST    ┌──────────────────────────┐
-│ Next.js     │ ───────► │ Python Orchestrator/API  │
-└────────────┘           └────────────┬─────────────┘
-                                      │ Parallel department routing
-                         ┌────────────┼────────────┐
-                         ▼            ▼            ▼
-                    dept-agent   dept-agent   dept-agent
-                         └────────────┬────────────┘
-                                      ▼
-                        MongoDB + Redis Stream + Worker
+┌─────────────┐  REST  ┌────────────────────────────┐        ┌──────────────────┐
+│ Next.js Web │ ─────► │ Python Orchestrator / API  │ ─────► │ pi Agent Runtime │
+└─────────────┘        └─────────────┬──────────────┘        └──────────────────┘
+                                     │ parallel department routing
+                       ┌─────────────┼─────────────┐
+                       ▼             ▼             ▼
+                  dept-agent    dept-agent    dept-agent
+                       └─────────────┬─────────────┘
+                                     ▼
+                     MongoDB + Redis Stream + Worker
 ```
 
-| Service | Directory | Responsibility |
+| Component | Path | Role |
 |---|---|---|
-| Frontend | `web/` | React + Next.js chat interface |
-| Backend | `backend/` | FastAPI: document parsing/chunking/vectorization, BM25 + vector hybrid retrieval, MongoDB/Redis storage, public REST API |
-| Agent execution engine | `services/pi-agent/` | Unified model inference, agent loop, and controlled tool calling for Intent/Rewrite/Answer/Verify/Reflect |
+| Web | `web/` | Next.js chat interface and admin console |
+| Backend | `backend/` | FastAPI control plane: ingestion, retrieval, memory, Loop, auth |
+| Agent runtime | `services/pi-agent/` | Executes the Intent / Rewrite / Answer / Verify / Reflect agents |
+| Deployment | `deploy/` | Kubernetes manifests and Helm chart |
 
-> Python is the sole control plane: it owns the fixed DAG, authentication, facts, memory, department isolation, dynamic policies, canary releases, and rollbacks.
-> pi is the unified probabilistic agent execution engine: it handles the agent loop, model calls, and controlled tool calling. pi does not directly decide data permissions or policy releases.
-
-## Directory Structure
-
-```
-program/
-├── README.md                 # This file
-├── docker-compose.yml        # Full-stack orchestration (MongoDB/Redis/backend/worker/pi-agent/web)
-├── .env.example              # Environment variable template
-├── Makefile
-├── docs/                     # Architecture / API / deployment / Loop docs
-├── docs/change-audit.md      # Audit of code changes vs. documentation coverage
-├── backend/                  # Python backend (see backend/README.md)
-├── services/pi-agent/        # pi agent service (see services/pi-agent/README.md)
-├── web/                      # Next.js frontend (see web/README.md)
-├── deploy/                   # K8s / Helm deployment (see deploy/README.md)
-├── design_files/             # Design inputs
-└── department_files/         # Sample department documents
-```
-
-## 🚀 Running After Installing Docker Desktop (Recommended)
-
-> Prerequisite: [Docker Desktop](https://www.docker.com/products/docker-desktop/) is installed and running (the Docker icon shows "running").
-
-```bash
-# 1. Enter the project directory
-cd program
-
-# 2. Copy the environment file and fill in real keys (or use the provided .env directly)
-cp .env.example .env
-
-# 3. Build and start the full stack in one command (the first run downloads images and is slow)
-docker compose up --build -d
-
-# 4. Check service status and logs
-docker compose ps
-docker compose logs -f
-```
-
-Once startup completes:
-
-| Service | URL |
-|---|---|
-| Frontend chat interface | http://localhost:8080 |
-| Backend API / OpenAPI docs | http://localhost:8000/docs |
-| pi agent service | http://localhost:8100/health |
-| MongoDB | `localhost:27017` (credentials in `.env`) |
-
-### Importing Sample Department Documents (First Run)
-
-```bash
-# Seed data (departments / glossary / organization calendar / default rules)
-docker compose exec backend python -m scripts.seed_data
-
-# Import the PDF/Word files under department_files (the script auto-detects /app/department_files; you can also specify it explicitly)
-docker compose exec backend python -m scripts.ingest_department_files --base /app/department_files
-```
-
-`seed_data` and the backend startup process idempotently initialize 3 executable baseline Skills (extreme-weather safety response, procedure step navigation, and academic milestone and deadline verification). They genuinely participate in query matching, retrieval expansion, answer templates, and policy execution records, and are not just for page display.
-
-The admin-side "Evolution Loop" uses asynchronous job tracking: after it is triggered, the page automatically polls `queued → running → completed` and shows the Observe / Reflect / Adapt / Deploy stages, feedback signals, root causes, candidates, release results, and before/after changes to policy assets.
-
-### Model Connectivity Self-Check (doctor)
-
-```bash
-# Verify that DeepSeek + the relay service (bge reranking / Embedding) can be called
-docker compose exec backend python -m scripts.doctor
-
-# Verify that the pi framework + DeepSeek work correctly
-# Note: doctor depends on devDependencies (tsx), which are unavailable in the container image, so it can only be run locally:
-cd services/pi-agent && npm install && npm run doctor
-```
-
-Stop and clean up:
-
-```bash
-docker compose down           # Stop
-docker compose down -v        # Stop and remove data volumes
-```
-
-## Local Development (Without Docker)
-
-Requires Python 3.9+ (3.11 recommended) and Node.js ≥ 22.19.
-
-```bash
-# 1) Backend
-cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-export STORAGE_MODE=memory   # Use in-memory mode when MongoDB/Redis are unavailable
-uvicorn app.main:app --reload --port 8000
-
-# 2) pi agent service (in another terminal)
-cd services/pi-agent
-npm install
-npm run dev                  # :8100
-
-# 3) Frontend (in another terminal)
-cd web
-npm install
-BACKEND_URL=http://localhost:8000 npm run dev   # :3000
-```
-
-## Environment Variables (Key Items)
-
-| Variable | Description | Default |
-|---|---|---|
-| `DEEPSEEK_API_KEY` / `DEEPSEEK_MODEL` | Primary chat model | `deepseek-v4-flash` |
-| `RELAY_API_KEY` / `RELAY_BASE_URL` | Relay service (for non-DeepSeek models) | `https://yunwu.ai/v1` |
-| `EMBEDDING_MODEL` | Embedding model (via the relay service) | `text-embedding-3-large` |
-| `RERANKER_MODEL` | bge reranker model (via the relay service) | `BAAI/bge-reranker-v2-m3` |
-| `PI_AGENT_ENABLED` | Whether to use pi to execute probabilistic agents uniformly; automatically falls back to the local Python implementation on failure | `true` |
-| `PI_RUNTIME_TIMEOUT_*` | Per-stage timeouts for pi Intent/Rewrite/Answer/Verify/Reflect | `8/10/45/20/45s` |
-| `DEPT_AGENTS_ENABLED` / `DEPT_ID` | Global department routing switch / enforced scope for a department Pod | `false` / empty |
-| `VECTOR_BACKEND` | Vector storage; K8s uses the shared `mongo` | `memory` |
-| `STORAGE_MODE` | `mongo` / `memory` | `mongo` |
-| `AUTH_SECRET` | Token signing secret (**must be changed to a strong random value in production**) | dev placeholder |
-| `INTERNAL_API_TOKEN` | Shared token for internal `/internal/*` endpoints (must match between backend and pi-agent) | empty (internal endpoints are unavailable if unset) |
-| `SEED_DEMO_USERS` | Whether to create demo accounts (set to `false` in production) | `true` |
-| `MAX_UPLOAD_MB` | Maximum document upload size | `20` |
-| `LOGIN_MAX_ATTEMPTS` / `LOGIN_WINDOW_SECONDS` | Failed-login rate limiting | `5` / `300` |
-| `MEMORY_SESSION_TTL_SECONDS` | Redis working-memory TTL | `1800` |
-| `MEMORY_EVENT_RETENTION_DAYS` / `MEMORY_SUMMARY_RETENTION_DAYS` | Retention period for episodic events / summaries | `90` / `180` |
-| `MONGO_INITDB_ROOT_USERNAME` / `MONGO_INITDB_ROOT_PASSWORD` | MongoDB root account (compose initialization) | `clausewise_admin` / strong random |
-| `REDIS_PASSWORD` | Redis password (compose requirepass) | strong random |
-
-> Verified in practice with `scripts/doctor.py`: DeepSeek `deepseek-v4-flash` ✅, relay service `gpt-5.5` ✅,
-> `text-embedding-3-large` ✅, bge reranker `BAAI/bge-reranker-v2-m3` ✅.
-> Note: this relay service does **not provide** `bge-m3` embedding or `gpt-5.5-pro` (these two names are invalid).
-
-## Module READMEs
-
-- [`backend/README.md`](backend/README.md)
-- [`services/pi-agent/README.md`](services/pi-agent/README.md)
-- [`web/README.md`](web/README.md)
-- [`deploy/README.md`](deploy/README.md)
-- [`docs/architecture.md`](docs/architecture.md) · [`docs/api.md`](docs/api.md) · [`docs/deployment.md`](docs/deployment.md) · [`docs/loop-engineering.md`](docs/loop-engineering.md)
+Python owns all decisions about permissions, facts, and policies; the pi runtime only executes model calls. If the runtime is unavailable, the backend falls back to local agents.
 
 ## Tech Stack
 
-Python 3.11 · FastAPI · MongoDB (motor) · Redis · Next.js 15 · React 19 · TypeScript ·
-[pi](https://github.com/earendil-works/pi) (pi-agent-core + pi-ai) · DeepSeek (chat) ·
-text-embedding-3-large / bge-reranker-v2-m3 (via the relay service) · Docker · Kubernetes · Helm
+Python 3.11 · FastAPI · MongoDB · Redis · Next.js 15 · React 19 · TypeScript · [pi](https://github.com/earendil-works/pi) · DeepSeek · text-embedding-3-large · bge-reranker-v2-m3 · Docker · Kubernetes · Helm
 
-## Verification
+## Quick Start
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
-cd backend && .venv/bin/pytest -q
+git clone https://github.com/CrstalLi02/clausewise.git
+cd clausewise
+cp .env.example .env        # fill in DEEPSEEK_API_KEY, RELAY_API_KEY, and the secrets
+docker compose up --build -d
+
+# Seed departments, glossary, and default rules
+docker compose exec backend python -m scripts.seed_data
+```
+
+| Service | URL |
+|---|---|
+| Web app | http://localhost:8080 |
+| API docs (Swagger) | http://localhost:8000/docs |
+| Agent runtime health | http://localhost:8100/health |
+
+Demo accounts (disable with `SEED_DEMO_USERS=false` in production):
+
+| Role | Username | Password |
+|---|---|---|
+| User | `student` | `student123` |
+| Department admin | `jwc_admin` | `admin123` |
+| Super admin | `admin` | `admin123` |
+
+### Adding Your Documents
+
+Put documents in `department_files/<Department Name>/`, then run:
+
+```bash
+docker compose exec backend python -m scripts.ingest_department_files --base /app/department_files
+```
+
+See [`department_files/README.md`](department_files/README.md) for how folder names map to departments. Sample documents are not included in this repository. The bundled seed data uses a university as an example and can be replaced with your own departments.
+
+## Local Development
+
+Requires Python 3.9+ (3.11 recommended) and Node.js 22.19+.
+
+```bash
+# Backend (in-memory mode, no MongoDB/Redis needed)
+cd backend && python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+STORAGE_MODE=memory uvicorn app.main:app --reload --port 8000
+
+# Agent runtime
+cd services/pi-agent && npm install && npm run dev      # :8100
+
+# Web
+cd web && npm install && BACKEND_URL=http://localhost:8000 npm run dev   # :3000
+```
+
+## Configuration
+
+All settings live in [`.env.example`](.env.example). The most important ones:
+
+| Variable | Description |
+|---|---|
+| `DEEPSEEK_API_KEY` | Chat model API key |
+| `RELAY_API_KEY` / `RELAY_BASE_URL` | OpenAI-compatible endpoint for embeddings and reranking |
+| `STORAGE_MODE` | `mongo` or `memory` |
+| `AUTH_SECRET` / `INTERNAL_API_TOKEN` | Must be strong random values in production |
+| `LOOP_PHASE` | `human_in_loop`, `human_on_loop`, or `human_out_of_loop` |
+
+## Testing
+
+```bash
+cd backend && pytest                 # 59 tests, runs fully offline
 cd web && npm run build
 cd services/pi-agent && npm run build
 ```
 
-The real-document evaluation set is located at `backend/evaluation/real_document_qa.json`. Running
-`python -m scripts.evaluate_rag` yields Recall@5, MRR, citation accuracy, and answer consistency.
-For the 1→20 replica load test of department agents, see `loadtest/README.md`.
+## Documentation
 
-## Memory and Fact Boundaries
-
-The system adopts "one independent fact plane + five memory planes":
-
-- `documents/chunks` is the highest-authority source of truth and is not part of model memory;
-- Redis session working memory;
-- MongoDB episodic events and summaries;
-- Explainable, deletable user semantic memory;
-- Organizational knowledge memory with official sources and department permissions;
-- Procedural and learning memory composed of Skills/Hooks/Rules/experiments.
-
-Every organizational FAQ must be bound to an active document chunk, and it automatically becomes invalid once the document is archived or replaced by a new version. See
-[`backend/app/memory/README.md`](backend/app/memory/README.md) for details.
+- [Architecture](docs/architecture.md) · [API](docs/api.md) · [Deployment](docs/deployment.md) · [Loop Engineering](docs/loop-engineering.md)
+- [Technical design](design_files/Clausewise-Technical-Design-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md) · [Code walkthrough](design_files/Clausewise-Code-Walkthrough-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md) · [User guide](design_files/Clausewise-Frontend-User-Guide.md)
+- Module READMEs: [backend](backend/README.md) · [agent runtime](services/pi-agent/README.md) · [web](web/README.md) · [deploy](deploy/README.md)

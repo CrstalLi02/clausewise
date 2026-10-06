@@ -19,7 +19,7 @@ DEFAULT_DATASET = Path(__file__).resolve().parents[1] / "evaluation" / "real_doc
 
 
 def _normalize(text: str) -> str:
-    return "".join(text.lower().split()).replace("：", ":").replace("－", "-").replace("‑", "-")
+    return "".join(text.lower().split()).replace("\uff1a", ":").replace("\uff0d", "-").replace("‑", "-")
 
 
 def _source_file(hit: dict[str, Any], docs: dict[str, dict[str, Any]]) -> str:

@@ -43,7 +43,7 @@ class StrategyEvaluator:
             )
             candidate_answer = await self.answer.generate(
                 query, candidate_chunks, rules=rules, intent=intent,
-                extra_instructions="；".join(plan.instructions),
+                extra_instructions="; ".join(plan.instructions),
             )
             candidate_verdict = await self.verifier.verify(query, candidate_answer, candidate_chunks)
             base_score = float(base_verdict.score)

@@ -192,7 +192,7 @@ class Orchestrator:
         await self.working_memory.set_retrieved(session_id, chunks)
 
         # 7. Answer (injecting the actual execution results of the Skill workflow)
-        skill_hints = "；".join(skill_plan.instructions)
+        skill_hints = "; ".join(skill_plan.instructions)
         answer = await self.answer_agent.generate(
             query, chunks, rules=rules, intent=intent, extra_instructions=skill_hints,
             memory_context=memory_prompt,

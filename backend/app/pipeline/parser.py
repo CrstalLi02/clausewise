@@ -115,7 +115,7 @@ class DocumentParser:
             digits = re.findall(r"\d+", style_name)
             level = int(digits[0]) if digits else 1
             return Block(type="heading", level=level, text=text)
-        if text.startswith(("•", "- ", "·", "1.", "2.", "3.", "（", "(")):
+        if text.startswith(("•", "- ", "·", "1.", "2.", "3.", "\uff08", "(")):
             return Block(type="list_item", level=1, text=text)
         return Block(type="paragraph", level=0, text=text)
 
