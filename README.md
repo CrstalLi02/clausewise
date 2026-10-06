@@ -1,4 +1,4 @@
-# Clausewise · Cross-Department Document Processing and Q&A Assistant
+# Clausewise：Document Processing and Q&A Assistant
 
 An intelligent processing and Q&A system for official policy documents in any multi-department organization — companies, government agencies, hospitals, universities, and more. The bundled demo dataset uses a university as an example (Academic Affairs, Student Affairs, Finance, Human Resources, Logistics, Graduate School, etc.); departments, documents, and glossary are fully configurable.
 
