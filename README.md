@@ -1,6 +1,6 @@
 # Clausewise · Cross-Department Document Processing and Q&A Assistant
 
-An intelligent processing and Q&A system for official policy documents across multiple school departments (Academic Affairs, Student Affairs, Finance, Human Resources, Logistics, Graduate School, etc.).
+An intelligent processing and Q&A system for official policy documents in any multi-department organization — companies, government agencies, hospitals, universities, and more. The bundled demo dataset uses a university as an example (Academic Affairs, Student Affairs, Finance, Human Resources, Logistics, Graduate School, etc.); departments, documents, and glossary are fully configurable.
 
 It covers the full loop of **"document ingestion → intelligent Q&A → self-evolution"**: automatic document parsing and ingestion, multi-agent collaborative Q&A with precise source tracing, Loop Engineering self-evolution (automatically accumulating Skills/Hooks/Rules), and per-department elastic scaling on K8s.
 
@@ -79,14 +79,14 @@ Once startup completes:
 ### Importing Sample Department Documents (First Run)
 
 ```bash
-# Seed data (departments / glossary / school calendar / default rules)
+# Seed data (departments / glossary / organization calendar / default rules)
 docker compose exec backend python -m scripts.seed_data
 
 # Import the PDF/Word files under department_files (the script auto-detects /app/department_files; you can also specify it explicitly)
 docker compose exec backend python -m scripts.ingest_department_files --base /app/department_files
 ```
 
-`seed_data` and the backend startup process idempotently initialize 3 executable baseline Skills (extreme-weather safety response, campus procedure step navigation, and academic milestone and deadline verification). They genuinely participate in query matching, retrieval expansion, answer templates, and policy execution records, and are not just for page display.
+`seed_data` and the backend startup process idempotently initialize 3 executable baseline Skills (extreme-weather safety response, procedure step navigation, and academic milestone and deadline verification). They genuinely participate in query matching, retrieval expansion, answer templates, and policy execution records, and are not just for page display.
 
 The admin-side "Evolution Loop" uses asynchronous job tracking: after it is triggered, the page automatically polls `queued → running → completed` and shows the Observe / Reflect / Adapt / Deploy stages, feedback signals, root causes, candidates, release results, and before/after changes to policy assets.
 

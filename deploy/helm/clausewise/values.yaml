@@ -1,7 +1,7 @@
 # Clausewise Helm Chart default values
 
 image:
-  repository: school-doc-agent
+  repository: clausewise-agent
   tag: "v1.0"
   pullPolicy: IfNotPresent
 
@@ -30,7 +30,7 @@ piAgent:
   enabled: true
   replicas: 2
   image:
-    repository: school-doc-agent
+    repository: clausewise-agent
     tag: "pi-v1.0"
   resources:
     requests: { cpu: "250m", memory: "256Mi" }

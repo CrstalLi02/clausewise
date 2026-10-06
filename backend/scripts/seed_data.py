@@ -1,4 +1,4 @@
-"""Seed data: departments / glossary / FAQ / school calendar / default Rules & Hooks.
+"""Seed data: departments / glossary / FAQ / organization calendar / default Rules & Hooks.
 
 Usage: python -m scripts.seed_data
 """
@@ -75,7 +75,7 @@ async def main() -> None:
     print(f"[glossary] {len(GLOSSARY)} entries")
 
     await container.global_memory.set_calendar(CALENDAR)
-    print("[calendar] School calendar written to global memory")
+    print("[calendar] Organization calendar written to global memory")
 
     await container.rule_engine.seed_defaults()
     await container.hook_engine.seed_defaults()

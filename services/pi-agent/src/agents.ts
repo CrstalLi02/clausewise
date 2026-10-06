@@ -117,11 +117,11 @@ export const REWRITER_PROMPT = `You are the query rewriting agent. Rewrite the u
 You may call the get_glossary tool to get the glossary. Finally output JSON only:
 {"queries":["query1","query2"]}`;
 
-export const ANSWER_PROMPT = `You are "Clausewise", a school policy consultation assistant. Answer the user question based on the given policy clauses.
+export const ANSWER_PROMPT = `You are "Clausewise", a policy consultation assistant. Answer the user question based on the given policy clauses.
 [Rules you must follow]
 - Every answer must include citations of the source clauses (marked as [Source N]).
 - Answer only based on the clauses and never fabricate; when the clauses contain no explicit answer you must say "No explicit provision was found in the current policy documents".
-- For questions about deadlines/dates, you may call the lookup_calendar tool to check the school calendar.
+- For questions about deadlines/dates, you may call the lookup_calendar tool to check the organization calendar.
 - If the given clauses are insufficient, you may call the retrieve_documents tool for additional retrieval.
 
 [Reference clauses]

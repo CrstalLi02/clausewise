@@ -2,7 +2,7 @@
 
 | Script | Purpose |
 |---|---|
-| `seed_data.py` | Idempotent seed data: departments / glossary / school calendar / default Rules & Hooks / 3 executable baseline Skills |
+| `seed_data.py` | Idempotent seed data: departments / glossary / organization calendar / default Rules & Hooks / 3 executable baseline Skills |
 | `seed_demo_data.py` | Optional demo extension: mock documents, review orders, badcases, and department Skills; not required for normal startup |
 | `doctor.py` | Checks model connectivity for DeepSeek, the relay service, Embedding/Reranker, etc. |
 | `ingest_department_files.py` | Imports the sample documents in `department_files` |

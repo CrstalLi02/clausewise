@@ -96,7 +96,7 @@ uvicorn app.main:app --reload --port 8000
 ## Running and Verification
 
 ```bash
-# Seed data (departments / glossary / school calendar / default rules / 3 baseline Skills)
+# Seed data (departments / glossary / organization calendar / default rules / 3 baseline Skills)
 python -m scripts.seed_data
 
 # Demo data (merged departments + per-department mock documents / pending review orders / badcases / initial Skills)

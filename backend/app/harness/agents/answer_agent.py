@@ -10,7 +10,7 @@ from app.integrations.pi_runtime import PiAgentRuntimeClient
 
 logger = get_logger(__name__)
 
-ANSWER_PROMPT = """You are "Clausewise", a school policy consultation assistant. Answer the user question based on the given policy clauses.
+ANSWER_PROMPT = """You are "Clausewise", a policy consultation assistant. Answer the user question based on the given policy clauses.
 
 [Rules you must follow]
 {rules}
@@ -62,12 +62,12 @@ class AnswerAgent:
             content = None
             if self.pi_runtime is not None:
                 content = await self.pi_runtime.run_text(
-                    "answer", "You are a school policy consultation assistant whose answers are rigorous and well-grounded.", prompt,
+                    "answer", "You are a policy consultation assistant whose answers are rigorous and well-grounded.", prompt,
                     allowed_tools=[], timeout_seconds=self.timeout,
                 )
             if not content:
                 messages = [
-                    ChatMessage.system("You are a school policy consultation assistant whose answers are rigorous and well-grounded."),
+                    ChatMessage.system("You are a policy consultation assistant whose answers are rigorous and well-grounded."),
                     ChatMessage.user(prompt),
                 ]
                 content = await self.llm.complete(messages, temperature=0.2)

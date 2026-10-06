@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: school-doc-agent:v1.0
+          image: clausewise-agent:v1.0
           ports:
             - containerPort: 8000
           env:

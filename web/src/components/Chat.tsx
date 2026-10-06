@@ -3,7 +3,7 @@ import { useCallback,useEffect,useRef,useState } from "react";
 import { askQuestion,checkHealth,deleteSession,forgetMemory,listSessions,myMemories,rememberForMe,sessionHistory,submitFeedback,submitImplicitFeedback,type ChatResult,type DeptRoute,type SessionSummary,type User,type UserMemoryItem } from "@/lib/api";
 import Icon from "./Icon"; import styles from "./Chat.module.css";
 interface Message { role:"user"|"assistant";content:string;citations?:ChatResult["citations"];error?:boolean;query?:string;rated?:"up"|"down";route?:DeptRoute|null;meta?:Pick<ChatResult,"confidence"|"intent_type"|"verification"|"retrieved_count"> }
-const SUGGESTIONS=["What safety precautions should faculty and students take during a rainstorm?","What are the complete steps of the psychological assessment?","What are the luggage storage requirements at the Sino-French Institute?","What do I need to prepare for the graduate thesis proposal defense?"];
+const SUGGESTIONS=["What safety precautions should staff take during a rainstorm?","What are the complete steps of the psychological assessment?","What are the luggage storage requirements at the Sino-French Institute?","What do I need to prepare for the graduate thesis proposal defense?"];
 function makeSessionId(){return typeof crypto!=="undefined"&&crypto.randomUUID?crypto.randomUUID():Date.now().toString()}
 export default function Chat({user,onLogout}:{user:User;onLogout:()=>void}){
  const [messages,setMessages]=useState<Message[]>([]),[input,setInput]=useState(""),[busy,setBusy]=useState(false),[online,setOnline]=useState<boolean|null>(null);

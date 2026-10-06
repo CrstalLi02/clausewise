@@ -3,7 +3,7 @@
 - All endpoints require the request header `X-Internal-Token: <INTERNAL_API_TOKEN>` (see app/api/deps.require_internal).
 - /internal/retrieve        Hybrid retrieval
 - /internal/departments     Department list
-- /internal/calendar        School calendar (global memory)
+- /internal/calendar        Organization calendar (global memory)
 - /internal/glossary        Glossary
 - /internal/feedback        Submit feedback
 - /internal/feedback/pending Pending feedback

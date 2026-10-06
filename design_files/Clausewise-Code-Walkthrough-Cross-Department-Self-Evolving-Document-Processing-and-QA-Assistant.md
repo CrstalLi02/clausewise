@@ -2,22 +2,22 @@
 
 ## 1. What Problem Does Clausewise Solve?
 
-A school usually has many departments such as Academic Affairs, Student Affairs, Finance, the Graduate School, and the Logistics and Security Department. Each department publishes large numbers of PDFs, Word files, notices, regulations, and service guides.
+Any sizable organization — a company, a government agency, a hospital, or a university — has many departments such as HR, Finance, Legal, Operations, and Administration. Each department publishes large numbers of PDFs, Word files, notices, regulations, and service guides.
 
 The traditional approach has three obvious problems:
 
-1. **Scattered files**: faculty and students do not know which department, which document, or which version holds the answer.
+1. **Scattered files**: employees and members do not know which department, which document, or which version holds the answer.
 2. **Inconsistent rules**: different departments may give different rules for the same matter.
 3. **Ordinary Q&A systems do not grow**: whatever their level at launch, they are at the same level six months later.
 
-"Clausewise" aims to build a knowledge hub for school policies:
+"Clausewise" aims to build a knowledge hub for organizational policies (the bundled demo uses a university as its example dataset):
 
 ```text
 Departments upload policy files
       ↓
 The system automatically parses, chunks, versions, and indexes them
       ↓
-Faculty and students ask questions in natural language
+Employees and members ask questions in natural language
       ↓
 Multiple department agents retrieve and answer collaboratively
       ↓
@@ -28,7 +28,7 @@ User feedback and review results enter the Loop
 The system accumulates new Skills / Hooks / Rules, and the next answer gets better
 ```
 
-If we compare it to a "super service clerk" at a school:
+If we compare it to a "super service clerk" in an organization:
 
 - MongoDB and the document indexes are its archive room;
 - the Intent Agent is the front-desk triage clerk;
@@ -81,9 +81,9 @@ docker compose exec backend python -m scripts.seed_data
 
 This script writes:
 
-- the school departments;
+- the demo departments;
 - the glossary;
-- the school calendar;
+- the organization calendar;
 - the default citation rule;
 - the default no-fabrication rule;
 - the default cross-department Hook.
@@ -189,7 +189,7 @@ These five layers are not a simple stack:
 
 ```mermaid
 flowchart LR
-    U["Students / Faculty / Admins"] --> WEB["Next.js Web"]
+    U["Users / Department Admins / Super Admins"] --> WEB["Next.js Web"]
     WEB --> API["Python Orchestrator / API"]
     API --> PI["pi Agent Runtime<br/>Intent / Rewrite / Answer / Verify / Reflect"]
     API --> JWC["Academic Affairs Agent Pod"]
@@ -758,7 +758,7 @@ Memory is the most misunderstood module in advanced agent systems.
 
 Clausewise first makes an important distinction: **official policy text is not memory; it is fact.**
 
-Memory can help understand what a user means by "that deadline", but it can never treat "I remember it's week 10" as school policy.
+Memory can help understand what a user means by "that deadline", but it can never treat "I remember it's week 10" as official policy.
 
 ### 9.1 One Fact Plane + Five Memory Planes
 
@@ -860,7 +860,7 @@ Organizational memory includes:
 
 - department FAQs;
 - procedure tips;
-- the school calendar;
+- the organization calendar;
 - conflict coordination outcomes;
 - department hot topics.
 
@@ -1046,7 +1046,7 @@ It uses DBSCAN to cluster the embeddings of frequent questions. Once a cluster r
 Before production traces are enough to reach the clustering threshold, `backend/app/loop/default_skills.py` idempotently initializes three real, executable baseline Skills:
 
 - Extreme Weather Safety Response: expands retrieval for warnings, shelter, emergency phone numbers, etc., and uses the Risks—Actions—Help template;
-- Campus Procedure Step Navigation: organizes instructions such as the psychological assessment and luggage storage into Prerequisites—Steps—Completion check;
+- Procedure Step Navigation: organizes instructions such as the psychological assessment and luggage storage into Prerequisites—Steps—Completion check;
 - Academic Milestone and Deadline Verification: expands recall of date evidence, applies calendar constraints, and distinguishes different milestones.
 
 They are not static samples to fill the page; they share the same `SkillExecutor`, version snapshots, canary bucketing, and metrics system with automatically mined Skills.
@@ -1407,7 +1407,7 @@ Clausewise does not just store feedback for reports; feedback can go through ref
 The system does not only remember user preferences; it can also accumulate:
 
 - department FAQs;
-- the school calendar;
+- the organization calendar;
 - conflict coordination outcomes;
 - department rubrics;
 - cross-department workflows.

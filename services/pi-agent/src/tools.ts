@@ -49,7 +49,7 @@ export function buildTools(config: Config): AgentTool[] {
     },
     {
       name: "lookup_calendar",
-      label: "Look up school calendar",
+      label: "Look up organization calendar",
       description: "Look up the current semester calendar (milestones such as semester start, holidays, and course registration weeks).",
       parameters: Type.Object({}),
       execute: async () => {

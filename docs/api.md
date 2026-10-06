@@ -133,7 +133,7 @@ when `INTERNAL_API_TOKEN` is not configured, internal endpoints return 503 direc
 | POST | `/api/v1/internal/retrieve` | Hybrid retrieval, returns chunks (with doc_title) |
 | POST | `/api/v1/internal/dept/answer` | Department-agent-specific Q&A; enforces that the request dept_id matches the instance `DEPT_ID` |
 | GET | `/api/v1/internal/departments` | Department list |
-| GET | `/api/v1/internal/calendar` | School calendar (global memory) |
+| GET | `/api/v1/internal/calendar` | Organization calendar (global memory) |
 | GET | `/api/v1/internal/glossary` | Glossary |
 | POST | `/api/v1/internal/feedback` | Submit feedback |
 | GET | `/api/v1/internal/feedback/pending` | Pending feedback |

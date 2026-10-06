@@ -46,7 +46,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: agent
-          image: school-doc-agent:v1.0
+          image: clausewise-agent:v1.0
           ports:
             - containerPort: 8000
           env:

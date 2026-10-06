@@ -77,7 +77,7 @@ class SkillExecutor:
                 if template and template != "default":
                     plan.instructions.append(f"Use the output template: {template}")
             elif kind == "call_tool" and params.get("tool") == "calendar_lookup":
-                plan.instructions.append("When answering about dates or deadlines, you must consult the school calendar and state the basis for each date explicitly.")
+                plan.instructions.append("When answering about dates or deadlines, you must consult the organization calendar and state the basis for each date explicitly.")
         for rubric in skill.get("rubric_rules") or []:
             plan.instructions.append(str(rubric))
 

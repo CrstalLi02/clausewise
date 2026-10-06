@@ -27,7 +27,7 @@ from app.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-QUESTION_PROMPT = """You are a test question generator for school policy documents. Based on the given document content, generate {n} Q&A questions that test the document's core clauses.
+QUESTION_PROMPT = """You are a test question generator for policy documents. Based on the given document content, generate {n} Q&A questions that test the document's core clauses.
 
 Output a JSON array only (no other text):
 [
@@ -44,7 +44,7 @@ Document content:
 {content}
 """
 
-SELF_ANSWER_SYSTEM = "You are a school policy consultation assistant whose answers are rigorous and well-grounded."
+SELF_ANSWER_SYSTEM = "You are a policy consultation assistant whose answers are rigorous and well-grounded."
 
 
 def _now() -> str:

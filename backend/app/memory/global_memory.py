@@ -1,4 +1,4 @@
-"""Global memory: knowledge shared across departments (global Skills/Rules, semester calendar, campus-wide glossary)."""
+"""Global memory: knowledge shared across departments (global Skills/Rules, organization calendar, organization-wide glossary)."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -27,7 +27,7 @@ class GlobalMemory:
         await self.store.upsert("global_memory", mem)
         await self.store.upsert("org_memory_items", {
             "_id": "orgmem_global_calendar", "scope": "global", "dept_id": "",
-            "type": "calendar", "title": "Current school calendar", "content": str(calendar),
+            "type": "calendar", "title": "Current organization calendar", "content": str(calendar),
             "source_refs": [], "source_doc_ids": [], "authority": "admin_approved",
             "confidence": 1.0, "review_status": "approved", "status": "active",
             "access_scope": ["student", "teacher", "admin"], "revision": 1,

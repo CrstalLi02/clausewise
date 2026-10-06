@@ -8,7 +8,7 @@ Official policy documents are not model memory; they form an independent fact pl
 | Session working memory | `working.py` | Redis | Recent messages, summary, entities, departments, and chunk IDs; TTL defaults to 30 minutes |
 | Episodic memory | `episodic.py` | `conversation_events/conversation_summaries` | Append-only message events, session restoration, and rolling summaries |
 | User semantic memory | `user_semantic.py` | `user_memory_items/memory_candidates` | Explicit user preferences and verified profile data; sensitive items are rejected, inferred items await review |
-| Organizational knowledge memory | `organization.py` | `org_memory_items/memory_topics` | FAQs, procedure tips, school calendar, and coordination outcomes; FAQs must be bound to an official source |
+| Organizational knowledge memory | `organization.py` | `org_memory_items/memory_topics` | FAQs, procedure tips, organization calendar, and coordination outcomes; FAQs must be bound to an official source |
 | Procedural/learning memory | `learning.py` + `app/loop/` | Skills/Hooks/Rules/experiment collections | Changes how the next round executes; supports canary, replay, and rollback |
 
 ## Unified Context

@@ -92,9 +92,9 @@ For the 1→20 Pod load-validation commands and pass thresholds, see `../loadtes
 
 ```bash
 # Backend
-docker build -t school-doc-agent:v1.0 -f ../backend/Dockerfile ../backend
+docker build -t clausewise-agent:v1.0 -f ../backend/Dockerfile ../backend
 # Frontend
-docker build -t school-doc-web:v1.0 ../web
+docker build -t clausewise-web:v1.0 ../web
 ```
 
 ## 6. pi Agent Runtime + Next.js Frontend

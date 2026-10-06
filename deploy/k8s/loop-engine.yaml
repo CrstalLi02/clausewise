@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: loop-engine
-          image: school-doc-agent:v1.0
+          image: clausewise-agent:v1.0
           command: ["python", "-m", "scripts.async_worker"]
           env:
             - name: UPLOAD_STORAGE_DIR

@@ -30,7 +30,7 @@ async def test_skill_treatment_changes_retrieval_plan():
     plan = await executor.prepare("Proposal deadline", ["Proposal deadline"], matched, "session-1", "u1")
     assert plan.top_k == 9
     assert any("calendar deadline date" in q for q in plan.queries)
-    assert any("school calendar" in text for text in plan.instructions)
+    assert any("organization calendar" in text for text in plan.instructions)
     row = (await store.find("strategy_executions"))[0]
     assert row["group"] == "treatment"
 

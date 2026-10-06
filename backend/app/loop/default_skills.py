@@ -38,7 +38,7 @@ DEFAULT_SKILLS: list[dict[str, Any]] = [
     },
     {
         "_id": "skill_dept_zfxy_procedure_seed",
-        "name": "Campus Procedure Step Navigation",
+        "name": "Procedure Step Navigation",
         "description": "Turns operating instructions such as the psychological assessment and luggage storage into ordered steps with conditions and sources.",
         "dept_id": "dept_zfxy", "scope": "department",
         "trigger": {
@@ -74,7 +74,7 @@ DEFAULT_SKILLS: list[dict[str, Any]] = [
             ],
         },
         "unique_rules": ["Clearly distinguish the notice publication date, the material submission deadline, the defense date, and the applicable audience."],
-        "rubric_rules": ["When a policy conflicts with the school calendar, treat the current active policy text as the factual basis and prompt for human confirmation."],
+        "rubric_rules": ["When a policy conflicts with the organization calendar, treat the current active policy text as the factual basis and prompt for human confirmation."],
     },
 ]
 

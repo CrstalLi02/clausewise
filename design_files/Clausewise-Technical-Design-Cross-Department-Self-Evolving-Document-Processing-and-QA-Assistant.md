@@ -8,11 +8,11 @@
 
 ### 1.1 Project Goals
 
-Build an intelligent processing and Q&A system for official policy documents across multiple school departments (Academic Affairs, Student Affairs, Finance, Human Resources, Logistics, Graduate School, etc.). Core capabilities:
+Build an intelligent processing and Q&A system for official policy documents across the departments of any organization (such as HR, Finance, Legal, Operations, IT, and Administration). The examples in this document use a university (Academic Affairs, Student Affairs, Finance, Graduate School, etc.) as the reference scenario. Core capabilities:
 
 - **Unified ingestion**: policy documents from each department (PDF/Word/Markdown) are automatically parsed, structured, and stored with versions in MongoDB.
 
-- **Precise Q&A**: multi-agent intent recognition + hybrid retrieval answers faculty and student questions about policy clauses and traces each answer back to the source text.
+- **Precise Q&A**: multi-agent intent recognition + hybrid retrieval answers employees' and members' questions about policy clauses and traces each answer back to the source text.
 
 - **Self-evolution**: Loop Engineering lets the system automatically accumulate Skills, Hooks, and Rules through real usage, becoming more accurate over time.
 
@@ -435,7 +435,7 @@ The memory system is the "glue" of multi-agent collaboration, organized in four 
 |Memory Layer|Storage|Content|Lifecycle|
 |---|---|---|---|
 |**Working memory**|Redis (current session)|Context of the current conversation: the last N turns, recognized intent, retrieved chunks, intermediate reasoning results. Structured as a Conversation Session object, TTL=30min|Session level|
-|**User memory**|MongoDB `user_profiles`|User profile: role (student/teacher), school/department, year, frequently consulted departments, historically frequent question types, preferences (e.g., concise answers vs. detailed clause citations), feedback history|User level, long-term|
+|**User memory**|MongoDB `user_profiles`|User profile: role, department/unit, seniority, frequently consulted departments, historically frequent question types, preferences (e.g., concise answers vs. detailed clause citations), feedback history|User level, long-term|
 |**Department memory**|MongoDB `dept_memory`|Department-level knowledge: the department's Skills/Hooks/Rules, common FAQs (accumulated automatically from frequent Q&A pairs), glossary, known conflicting clauses, hot-question trends|Department level, long-term, updated by the Loop|
 |**Global memory**|MongoDB `global_memory`|Knowledge shared across departments: cross-department Skills (e.g., "leave of absence" involves Academic Affairs + Student Affairs + Finance), global Rules, system-level Hooks, the semester calendar, campus-wide terminology|Global, long-term|
 
@@ -492,7 +492,7 @@ spec:
     spec:
       containers:
       - name: agent
-        image: school-doc-agent:v1.0
+        image: clausewise-agent:v1.0
         env:
         - name: DEPT_ID
           value: "dept_jwc"

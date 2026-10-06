@@ -41,7 +41,7 @@ when treatment underperforms control, it is rolled back automatically.
 
 ## Baseline Skills and Auto-Mined Skills
 
-Backend startup and `scripts.seed_data` idempotently create "Extreme Weather Safety Response", "Campus Procedure Step Navigation", and "Academic Milestone and Deadline Verification".
+Backend startup and `scripts.seed_data` idempotently create "Extreme Weather Safety Response", "Procedure Step Navigation", and "Academic Milestone and Deadline Verification".
 All three go directly into `SkillExecutor`, where they expand the query, raise top-k, inject output templates or calendar constraints, and record treatment/control,
 hit counts, and success rates. Once traces reach the clustering threshold, the Skill Miner still generates new candidate Skills; both kinds of Skills share the same governance chain.
 

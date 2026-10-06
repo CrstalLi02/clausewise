@@ -49,13 +49,13 @@ Controlled via the `LOOP_PHASE` environment variable: `human_in_loop | human_on_
 
 ## 6. Skills / Hooks / Rules
 
-- **Skills**: procedural knowledge — "how to do it". E.g., `deadline_query` (deadline lookup + school calendar tool + countdown template).
+- **Skills**: procedural knowledge — "how to do it". E.g., `deadline_query` (deadline lookup + organization calendar tool + countdown template).
 - **Hooks**: event responses — "what to trigger when". E.g., `cross_dept_hook` (course registration + payment → search both Academic Affairs and Finance).
 - **Rules**: hard constraints — "must be obeyed". E.g., `cite_source_rule` (must include citations), `no_guess_rule` (say so explicitly when there is no basis).
 
 ### Executable Baseline Skills
 
-`backend/app/loop/default_skills.py` idempotently provides three real workflows at startup: extreme-weather safety response, campus procedure step navigation,
+`backend/app/loop/default_skills.py` idempotently provides three real workflows at startup: extreme-weather safety response, procedure step navigation,
 and academic milestone and deadline verification. They demonstrate the full execution chain before high-frequency traces reach the auto-mining threshold, and they genuinely change the query, top-k,
 output template, or calendar constraints while recording versions, buckets, hits, and success rates. Automatically mined Skills use the same `SkillExecutor`.
 

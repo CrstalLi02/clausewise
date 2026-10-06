@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: pi-agent
-          image: school-doc-agent:pi-v1.0
+          image: clausewise-agent:pi-v1.0
           ports:
             - containerPort: 8100
           env:
