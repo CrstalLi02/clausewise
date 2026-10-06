@@ -1,0 +1,39 @@
+{{- if .Values.loopEngine.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "clausewise.fullname" . }}-loop-engine
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "clausewise.fullname" . }}-loop-engine
+  template:
+    metadata:
+      labels:
+        app: {{ include "clausewise.fullname" . }}-loop-engine
+    spec:
+      containers:
+        - name: loop-engine
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "-m", "scripts.async_worker"]
+          env:
+            {{- include "clausewise.env" . | nindent 12 }}
+            - name: LOOP_PHASE
+              value: {{ .Values.loopEngine.loopPhase | quote }}
+            - name: UPLOAD_STORAGE_DIR
+              value: "/data/uploads"
+          resources:
+            requests: { cpu: "250m", memory: "256Mi" }
+            limits: { cpu: "1000m", memory: "1Gi" }
+          volumeMounts:
+            - name: uploads
+              mountPath: /data/uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ include "clausewise.fullname" . }}-uploads
+{{- end }}

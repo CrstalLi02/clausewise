@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "clausewise.fullname" . }}-uploads
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  accessModes: [{{ .Values.uploads.accessMode | quote }}]
+  resources:
+    requests:
+      storage: {{ .Values.uploads.size }}

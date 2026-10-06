@@ -1,0 +1,69 @@
+# Standalone Loop Engine background service: consumes feedback and runs the evolution loop
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loop-engine
+  namespace: clausewise
+  labels:
+    app: loop-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loop-engine
+  template:
+    metadata:
+      labels:
+        app: loop-engine
+    spec:
+      containers:
+        - name: loop-engine
+          image: school-doc-agent:v1.0
+          command: ["python", "-m", "scripts.async_worker"]
+          env:
+            - name: UPLOAD_STORAGE_DIR
+              value: "/data/uploads"
+            - name: STORAGE_MODE
+              value: "mongo"
+            - name: EMBEDDING_PROVIDER
+              value: "relay"
+            - name: EMBEDDING_MODEL
+              value: "text-embedding-3-large"
+            - name: VECTOR_BACKEND
+              value: "mongo"
+            - name: LOOP_PHASE
+              value: "human_on_loop"
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: DEEPSEEK_API_KEY
+            - name: RELAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: RELAY_API_KEY
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: MONGODB_URI
+            - name: REDIS_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: REDIS_ADDR
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: uploads
+              mountPath: /data/uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: clausewise-uploads

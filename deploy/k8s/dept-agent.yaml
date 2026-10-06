@@ -1,0 +1,128 @@
+# Templated department agent example (Academic Affairs Office).
+# Each department gets its own Deployment + HPA with automatic scaling (high-traffic departments can reach maxReplicas 20).
+apiVersion: v1
+kind: Service
+metadata:
+  name: dept-agent-jwc
+  namespace: clausewise
+spec:
+  selector:
+    app: dept-agent
+    department: jwc
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dept-agent-jwc
+  namespace: clausewise
+  labels:
+    app: dept-agent
+    department: jwc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dept-agent
+      department: jwc
+  template:
+    metadata:
+      labels:
+        app: dept-agent
+        department: jwc
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: department
+                      operator: In
+                      values: ["jwc"]
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: agent
+          image: school-doc-agent:v1.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DEPT_ID
+              value: "dept_jwc"
+            - name: MODEL_NAME
+              value: "deepseek-v4-flash"
+            - name: STORAGE_MODE
+              value: "mongo"
+            - name: VECTOR_BACKEND
+              value: "mongo"
+            - name: DEPT_AGENTS_ENABLED
+              value: "false"
+            - name: PI_AGENT_ENABLED
+              value: "true"
+            - name: PI_AGENT_URL
+              value: "http://pi-agent:8100"
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: DEEPSEEK_API_KEY
+            - name: RELAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: RELAY_API_KEY
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: MONGODB_URI
+            - name: REDIS_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: REDIS_ADDR
+            - name: INTERNAL_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: INTERNAL_API_TOKEN
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dept-agent-jwc-hpa
+  namespace: clausewise
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dept-agent-jwc
+  minReplicas: 2
+  maxReplicas: 20   # Academic Affairs scales out to 20 Pods at peak
+  metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: clausewise_dept_agent_inflight
+        target:
+          type: AverageValue
+          averageValue: "8"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 3
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300

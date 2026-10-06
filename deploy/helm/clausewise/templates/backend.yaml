@@ -1,0 +1,83 @@
+{{- if .Values.backend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clausewise.fullname" . }}-backend
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: {{ include "clausewise.fullname" . }}-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "clausewise.fullname" . }}-backend
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "clausewise.fullname" . }}-backend
+  template:
+    metadata:
+      labels:
+        app: {{ include "clausewise.fullname" . }}-backend
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            {{- include "clausewise.env" . | nindent 12 }}
+            - name: DEPT_AGENTS_ENABLED
+              value: "true"
+            - name: DEPT_AGENT_URL_TEMPLATE
+              value: "http://dept-agent-{slug}:8000"
+            - name: UPLOAD_STORAGE_DIR
+              value: "/data/uploads"
+          readinessProbe:
+            httpGet: { path: /readyz, port: 8000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          volumeMounts:
+            - name: uploads
+              mountPath: /data/uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ include "clausewise.fullname" . }}-uploads
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "clausewise.fullname" . }}-backend-hpa
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "clausewise.fullname" . }}-backend
+  minReplicas: {{ .Values.backend.replicas }}
+  maxReplicas: {{ .Values.backend.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+{{- end }}

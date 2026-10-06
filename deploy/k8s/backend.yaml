@@ -1,0 +1,136 @@
+# Orchestrator + API global service (with HPA)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: clausewise
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: clausewise
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: school-doc-agent:v1.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: STORAGE_MODE
+              value: "mongo"
+            - name: VECTOR_BACKEND
+              value: "mongo"
+            - name: DEPT_AGENTS_ENABLED
+              value: "true"
+            - name: UPLOAD_STORAGE_DIR
+              value: "/data/uploads"
+            - name: EMBEDDING_PROVIDER
+              value: "relay"
+            - name: EMBEDDING_MODEL
+              value: "text-embedding-3-large"
+            - name: DEEPSEEK_MODEL
+              value: "deepseek-v4-flash"
+            - name: DEEPSEEK_BASE_URL
+              value: "https://api.deepseek.com"
+            - name: RELAY_BASE_URL
+              value: "https://yunwu.ai/v1"
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: DEEPSEEK_API_KEY
+            - name: RELAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: RELAY_API_KEY
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: MONGODB_URI
+            - name: REDIS_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: REDIS_ADDR
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: AUTH_SECRET
+            - name: INTERNAL_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: clausewise-secrets
+                  key: INTERNAL_API_TOKEN
+            - name: SEED_DEMO_USERS
+              value: "false"
+            - name: PI_AGENT_ENABLED
+              value: "true"
+            - name: PI_AGENT_URL
+              value: "http://pi-agent:8100"
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: uploads
+              mountPath: /data/uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: clausewise-uploads
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: clausewise
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

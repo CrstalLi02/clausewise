@@ -1,0 +1,83 @@
+# Clausewise Helm Chart default values
+
+image:
+  repository: school-doc-agent
+  tag: "v1.0"
+  pullPolicy: IfNotPresent
+
+# Secrets (use an external Secret / SealedSecret in production; never commit real values)
+secrets:
+  deepseekApiKey: ""
+  relayApiKey: ""
+  authSecret: "change-me-strong-random-secret"
+  internalApiToken: "change-me-strong-random-token"
+  mongoUser: "clausewise_admin"
+  mongoPassword: "change-me-strong-mongo-password"
+  redisPassword: "change-me-strong-redis-password"
+  mongodbUri: "mongodb://clausewise_admin:change-me-strong-mongo-password@mongodb:27017/clausewise?authSource=admin"
+  redisAddr: "redis://:change-me-strong-redis-password@redis:6379"
+
+# Global services
+backend:
+  enabled: true
+  replicas: 2
+  maxReplicas: 10
+  resources:
+    requests: { cpu: "250m", memory: "256Mi" }
+    limits: { cpu: "2000m", memory: "2Gi" }
+
+piAgent:
+  enabled: true
+  replicas: 2
+  image:
+    repository: school-doc-agent
+    tag: "pi-v1.0"
+  resources:
+    requests: { cpu: "250m", memory: "256Mi" }
+    limits: { cpu: "1000m", memory: "1Gi" }
+
+loopEngine:
+  enabled: true
+  interval: 300
+  loopPhase: "human_on_loop"
+
+uploads:
+  accessMode: ReadWriteMany
+  size: 10Gi
+
+# Model / vector configuration
+model:
+  deepseekModel: "deepseek-v4-flash"
+  deepseekBaseUrl: "https://api.deepseek.com"
+  relayBaseUrl: "https://yunwu.ai/v1"
+  embeddingProvider: "relay"
+  embeddingModel: "text-embedding-3-large"
+  vectorBackend: "mongo"
+
+# Department agents (templated: each entry renders an independent Deployment + HPA)
+departments:
+  - id: dept_jwc
+    name: Academic Affairs Office
+    minReplicas: 2
+    maxReplicas: 20
+    resources:
+      requests: { cpu: "500m", memory: "512Mi" }
+      limits: { cpu: "2000m", memory: "2Gi" }
+  - id: dept_xsc
+    name: Student Affairs Office
+    minReplicas: 2
+    maxReplicas: 20
+    resources:
+      requests: { cpu: "500m", memory: "512Mi" }
+      limits: { cpu: "2000m", memory: "2Gi" }
+  - id: dept_hqc
+    name: Logistics Office
+    minReplicas: 1
+    maxReplicas: 5
+    resources:
+      requests: { cpu: "250m", memory: "256Mi" }
+      limits: { cpu: "1000m", memory: "1Gi" }
+
+ingress:
+  enabled: false
+  host: clausewise.example.com

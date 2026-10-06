@@ -1,0 +1,128 @@
+# Clausewise · Full-stack orchestration (MongoDB + Redis + Python backend + pi agent service + Next.js frontend)
+# Usage: docker compose up --build
+name: clausewise
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: clausewise-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-clausewise}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-clausewise}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "-u", "${MONGO_INITDB_ROOT_USERNAME:-clausewise}", "-p", "${MONGO_INITDB_ROOT_PASSWORD:-clausewise}", "--authenticationDatabase", "admin", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: clausewise-redis
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-clausewise}
+    command: ["sh", "-c", "redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: clausewise-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-clausewise}:${MONGO_INITDB_ROOT_PASSWORD:-clausewise}@mongodb:27017/${MONGODB_DB:-clausewise}?authSource=admin
+      REDIS_ADDR: redis://:${REDIS_PASSWORD:-clausewise}@redis:6379
+      PI_AGENT_URL: http://pi-agent:8100
+      PI_AGENT_ENABLED: "true"
+      VECTOR_BACKEND: mongo
+      HOST: 0.0.0.0
+      PORT: 8000
+      UPLOAD_STORAGE_DIR: /data/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./department_files:/app/department_files:ro
+      - upload_data:/data/uploads
+
+  worker:
+    build:
+      context: ./backend
+    container_name: clausewise-worker
+    restart: unless-stopped
+    command: ["python", "-m", "scripts.async_worker"]
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME:-clausewise}:${MONGO_INITDB_ROOT_PASSWORD:-clausewise}@mongodb:27017/${MONGODB_DB:-clausewise}?authSource=admin
+      REDIS_ADDR: redis://:${REDIS_PASSWORD:-clausewise}@redis:6379
+      STORAGE_MODE: mongo
+      VECTOR_BACKEND: mongo
+      UPLOAD_STORAGE_DIR: /data/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - upload_data:/data/uploads
+
+  pi-agent:
+    build:
+      context: ./services/pi-agent
+    container_name: clausewise-pi-agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: 8100
+      HOST: 0.0.0.0
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "8100:8100"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8100/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./web
+      args:
+        BACKEND_URL: http://backend:8000
+    container_name: clausewise-web
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+      PORT: 3000
+    ports:
+      - "8080:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:
+  redis_data:
+  upload_data:

@@ -1,0 +1,96 @@
+# Prometheus Adapter exposes the department agent in-flight request metric as a custom HPA Pods metric.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-adapter-config
+  namespace: clausewise
+data:
+  config.yaml: |
+    rules:
+      - seriesQuery: 'clausewise_dept_agent_inflight{dept!=""}'
+        resources:
+          overrides:
+            namespace: {resource: namespace}
+            pod: {resource: pod}
+        name:
+          matches: '^clausewise_dept_agent_inflight$'
+          as: 'clausewise_dept_agent_inflight'
+        metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: prometheus-adapter, namespace: clausewise}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: clausewise-prometheus-adapter}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/stats", "namespaces", "pods", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["subjectaccessreviews"]
+    verbs: ["create"]
+  - apiGroups: ["authentication.k8s.io"]
+    resources: ["tokenreviews"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: clausewise-prometheus-adapter}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: clausewise-prometheus-adapter}
+subjects: [{kind: ServiceAccount, name: prometheus-adapter, namespace: clausewise}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: prometheus-adapter-auth-reader, namespace: kube-system}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: extension-apiserver-authentication-reader}
+subjects: [{kind: ServiceAccount, name: prometheus-adapter, namespace: clausewise}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: prometheus-adapter, namespace: clausewise}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: prometheus-adapter}}
+  template:
+    metadata: {labels: {app: prometheus-adapter}}
+    spec:
+      serviceAccountName: prometheus-adapter
+      containers:
+        - name: adapter
+          image: registry.k8s.io/prometheus-adapter/prometheus-adapter:v0.12.0
+          args: ["--secure-port=6443", "--cert-dir=/tmp/cert", "--prometheus-url=http://prometheus.clausewise.svc.cluster.local:9090", "--metrics-relist-interval=30s", "--config=/etc/adapter/config.yaml"]
+          ports: [{name: https, containerPort: 6443}]
+          readinessProbe: {httpGet: {path: /healthz, port: https, scheme: HTTPS}}
+          volumeMounts: [{name: config, mountPath: /etc/adapter}]
+      volumes: [{name: config, configMap: {name: prometheus-adapter-config}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: prometheus-adapter, namespace: clausewise}
+spec:
+  selector: {app: prometheus-adapter}
+  ports: [{name: https, port: 443, targetPort: https}]
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata: {name: v1beta1.custom.metrics.k8s.io}
+spec:
+  service: {name: prometheus-adapter, namespace: clausewise}
+  group: custom.metrics.k8s.io
+  version: v1beta1
+  groupPriorityMinimum: 100
+  versionPriority: 100
+  insecureSkipTLSVerify: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: clausewise-custom-metrics-reader}
+rules: [{apiGroups: ["custom.metrics.k8s.io"], resources: ["*"], verbs: ["get", "list"]}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: clausewise-hpa-custom-metrics}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: clausewise-custom-metrics-reader}
+subjects: [{kind: ServiceAccount, name: horizontal-pod-autoscaler, namespace: kube-system}]

@@ -1,0 +1,58 @@
+{{- if .Values.piAgent.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: pi-agent
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: pi-agent
+  ports:
+    - port: 8100
+      targetPort: 8100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pi-agent
+  labels:
+    {{- include "clausewise.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.piAgent.replicas }}
+  selector:
+    matchLabels:
+      app: pi-agent
+  template:
+    metadata:
+      labels:
+        app: pi-agent
+    spec:
+      containers:
+        - name: pi-agent
+          image: "{{ .Values.piAgent.image.repository }}:{{ .Values.piAgent.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8100
+          env:
+            - name: PORT
+              value: "8100"
+            - name: BACKEND_URL
+              value: "http://{{ include "clausewise.fullname" . }}-backend:8000"
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clausewise.fullname" . }}-secret
+                  key: DEEPSEEK_API_KEY
+            - name: INTERNAL_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clausewise.fullname" . }}-secret
+                  key: INTERNAL_API_TOKEN
+          readinessProbe:
+            httpGet: { path: /health, port: 8100 }
+          livenessProbe:
+            httpGet: { path: /health, port: 8100 }
+          resources:
+            {{- toYaml .Values.piAgent.resources | nindent 12 }}
+{{- end }}

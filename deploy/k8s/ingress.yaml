@@ -1,0 +1,28 @@
+# Gateway/ingress (includes example rate-limit annotations; adjust for your Ingress Controller)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clausewise-ingress
+  namespace: clausewise
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+spec:
+  rules:
+    - host: clausewise.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000

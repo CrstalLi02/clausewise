@@ -1,0 +1,119 @@
+[
+  {
+    "id": "zf-open-proposal-word-count",
+    "dept_id": "dept_zfxy",
+    "query": "What is the word count requirement for the thesis proposal of dual-degree master's students?",
+    "relevant_files": [
+      "研究生开题报告通知-中法未来.docx"
+    ],
+    "expected_terms": [
+      "at least 5000 words"
+    ]
+  },
+  {
+    "id": "zf-literature-count",
+    "dept_id": "dept_zfxy",
+    "query": "How many references must be read for the proposal literature review, and how many of them in foreign languages?",
+    "relevant_files": [
+      "研究生开题报告通知-中法未来.docx"
+    ],
+    "expected_terms": [
+      "at least 30",
+      "at least 15"
+    ]
+  },
+  {
+    "id": "zf-proposal-deadline",
+    "dept_id": "dept_zfxy",
+    "query": "What is the latest date for graduate students to enter their proposal information in the system?",
+    "relevant_files": [
+      "研究生开题报告通知-中法未来.docx"
+    ],
+    "expected_terms": [
+      "before July 10, 2026"
+    ]
+  },
+  {
+    "id": "zf-defense-location",
+    "dept_id": "dept_zfxy",
+    "query": "Where is the graduate proposal defense of the Sino-French Future Technology Institute held?",
+    "relevant_files": [
+      "开题答辩分组安排.docx"
+    ],
+    "expected_terms": [
+      "Teaching Building 1, Room 2001"
+    ]
+  },
+  {
+    "id": "zf-luggage-valuables",
+    "dept_id": "dept_zfxy",
+    "query": "Can electronic products and degree certificates be stored in dormitory luggage storage?",
+    "relevant_files": [
+      "中法宿舍行李寄存承诺书.docx"
+    ],
+    "expected_terms": [
+      "not included",
+      "electronic products",
+      "degree certificates"
+    ]
+  },
+  {
+    "id": "zf-assessment-count",
+    "dept_id": "dept_zfxy",
+    "query": "How many assessments must be completed after logging in to the psychological assessment?",
+    "relevant_files": [
+      "心理测评操作说明.pdf"
+    ],
+    "expected_terms": [
+      "3 assessments"
+    ]
+  },
+  {
+    "id": "hq-emergency-phone",
+    "dept_id": "dept_hqaq",
+    "query": "What is the campus 24-hour emergency phone number?",
+    "relevant_files": [
+      "关于校园防汛应急响应措施的通知.docx",
+      "暴雨天气致全体师生的温馨提醒.docx"
+    ],
+    "expected_terms": [
+      "0571-28881110"
+    ]
+  },
+  {
+    "id": "hq-venue-close-time",
+    "dept_id": "dept_hqaq",
+    "query": "When do sports venues and the library suspend opening during the flood response?",
+    "relevant_files": [
+      "关于校园防汛应急响应措施的通知.docx"
+    ],
+    "expected_terms": [
+      "from 8:00 on August 15"
+    ]
+  },
+  {
+    "id": "hq-gate-control",
+    "dept_id": "dept_hqaq",
+    "query": "Which campus gates can vehicles use during the flood-prevention period?",
+    "relevant_files": [
+      "关于校园防汛应急响应措施的通知.docx"
+    ],
+    "expected_terms": [
+      "West Gate",
+      "East Gate"
+    ]
+  },
+  {
+    "id": "hq-typhoon-outdoor",
+    "dept_id": "dept_hqaq",
+    "query": "During the typhoon, may I go out to watch the storm or take photos while wading through water?",
+    "relevant_files": [
+      "关于防御第9号超强台风“巴威”的安全提示(1)(1).pdf"
+    ],
+    "expected_terms": [
+      "avoid going out unless necessary",
+      "do not go out to watch the storm",
+      "taking photos while wading"
+    ]
+  }
+]

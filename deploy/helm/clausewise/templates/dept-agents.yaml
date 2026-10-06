@@ -1,0 +1,95 @@
+{{- range $dept := .Values.departments }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dept-agent-{{ $dept.id | trimPrefix "dept_" | replace "_" "-" }}
+  labels:
+    {{- include "clausewise.labels" $ | nindent 4 }}
+    department: {{ $dept.id }}
+spec:
+  selector:
+    app: dept-agent
+    department: {{ $dept.id }}
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dept-agent-{{ $dept.id | trimPrefix "dept_" | replace "_" "-" }}
+  labels:
+    {{- include "clausewise.labels" $ | nindent 4 }}
+    department: {{ $dept.id }}
+spec:
+  replicas: {{ $dept.minReplicas }}
+  selector:
+    matchLabels:
+      app: dept-agent
+      department: {{ $dept.id }}
+  template:
+    metadata:
+      labels:
+        app: dept-agent
+        department: {{ $dept.id }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: department
+                      operator: In
+                      values: [{{ $dept.id | quote }}]
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: agent
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            {{- include "clausewise.env" $ | nindent 12 }}
+            - name: DEPT_ID
+              value: {{ $dept.id | quote }}
+            - name: DEPT_AGENTS_ENABLED
+              value: "false"
+            - name: MODEL_NAME
+              value: {{ $.Values.model.deepseekModel | quote }}
+          resources:
+            {{- toYaml $dept.resources | nindent 12 }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dept-agent-{{ $dept.id | trimPrefix "dept_" | replace "_" "-" }}-hpa
+  labels:
+    {{- include "clausewise.labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dept-agent-{{ $dept.id | trimPrefix "dept_" | replace "_" "-" }}
+  minReplicas: {{ $dept.minReplicas }}
+  maxReplicas: {{ $dept.maxReplicas }}
+  metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: clausewise_dept_agent_inflight
+        target:
+          type: AverageValue
+          averageValue: "8"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 3
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+{{- end }}
