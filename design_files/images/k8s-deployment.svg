@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1340" viewBox="0 0 1500 1340" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#111" stroke-width="1.6"/>
+    </marker>
+    <style>
+      .box { fill: #EEF2FB; stroke: #111; stroke-width: 3; }
+      .t { font-size: 29px; fill: #222; text-anchor: middle; }
+      .s { font-size: 25px; fill: #444; text-anchor: middle; }
+      .ln { stroke: #111; stroke-width: 3; fill: none; }
+    </style>
+  </defs>
+  <rect width="1500" height="1340" fill="#fff"/>
+
+  <!-- Gateway -->
+  <rect class="box" x="823" y="50" width="236" height="156" rx="12"/>
+  <text class="t" x="941" y="118">API Gateway</text>
+  <text class="s" x="941" y="160">Auth / routing</text>
+
+  <path class="ln" d="M941 206 V296 Q941 308 929 308 H567 Q555 308 555 320 V398" marker-end="url(#arrow)"/>
+  <path class="ln" d="M941 296 V398" marker-end="url(#arrow)"/>
+  <path class="ln" d="M941 296 Q941 308 953 308 H1316 Q1328 308 1328 320 V398" marker-end="url(#arrow)"/>
+
+  <!-- Tier 2 -->
+  <rect class="box" x="437" y="409" width="236" height="156" rx="12"/>
+  <text class="t" x="555" y="458">Orchestrator</text>
+  <text class="s" x="555" y="498">HPA: autoscale</text>
+  <text class="s" x="555" y="532">on CPU / traffic</text>
+
+  <rect class="box" x="823" y="409" width="236" height="156" rx="12"/>
+  <text class="t" x="941" y="497">Loop Engine</text>
+
+  <rect class="box" x="1210" y="409" width="236" height="156" rx="12"/>
+  <text class="t" x="1328" y="497">Monitoring</text>
+
+  <path class="ln" d="M555 565 V658 Q555 670 543 670 H143 Q131 670 131 682 V762" marker-end="url(#arrow)"/>
+  <path class="ln" d="M555 658 V762" marker-end="url(#arrow)"/>
+  <path class="ln" d="M555 658 Q555 670 567 670 H929 Q941 670 941 682 V762" marker-end="url(#arrow)"/>
+
+  <!-- Departments -->
+  <rect class="box" x="50" y="773" width="236" height="156" rx="12"/>
+  <text class="t" x="168" y="842">Dept 1 Agent</text>
+  <text class="s" x="168" y="882">e.g. HR</text>
+
+  <rect class="box" x="437" y="773" width="236" height="156" rx="12"/>
+  <text class="t" x="555" y="842">Dept 2 Agent</text>
+  <text class="s" x="555" y="882">e.g. Finance</text>
+
+  <line x1="684" y1="851" x2="810" y2="851" stroke="#111" stroke-width="4" stroke-dasharray="3 9"/>
+
+  <rect class="box" x="823" y="773" width="236" height="156" rx="12"/>
+  <text class="t" x="941" y="842">Dept N Agent</text>
+  <text class="s" x="941" y="882">e.g. Operations</text>
+
+  <path class="ln" d="M941 929 V1022 Q941 1034 929 1034 H567 Q555 1034 555 1046 V1126" marker-end="url(#arrow)"/>
+  <path class="ln" d="M941 1022 V1126" marker-end="url(#arrow)"/>
+  <path class="ln" d="M941 1022 Q941 1034 953 1034 H1316 Q1328 1034 1328 1046 V1126" marker-end="url(#arrow)"/>
+
+  <!-- Data -->
+  <rect class="box" x="437" y="1137" width="236" height="156" rx="12"/>
+  <text class="t" x="555" y="1205">Milvus</text>
+  <text class="s" x="555" y="1245">Vector cluster</text>
+
+  <rect class="box" x="823" y="1137" width="236" height="156" rx="12"/>
+  <text class="t" x="941" y="1205">MongoDB</text>
+  <text class="s" x="941" y="1245">Docs / Skills / Rules</text>
+
+  <rect class="box" x="1210" y="1137" width="236" height="156" rx="12"/>
+  <text class="t" x="1328" y="1205">Redis Cluster</text>
+  <text class="s" x="1328" y="1245">Primary / replicas</text>
+</svg>

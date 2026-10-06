@@ -16,18 +16,7 @@ Clausewise ingests official policy documents from every department, answers ques
 
 ## Architecture
 
-```
-┌─────────────┐  REST  ┌────────────────────────────┐        ┌──────────────────┐
-│ Next.js Web │ ─────► │ Python Orchestrator / API  │ ─────► │ pi Agent Runtime │
-└─────────────┘        └─────────────┬──────────────┘        └──────────────────┘
-                                     │ parallel department routing
-                       ┌─────────────┼─────────────┐
-                       ▼             ▼             ▼
-                  dept-agent    dept-agent    dept-agent
-                       └─────────────┬─────────────┘
-                                     ▼
-                     MongoDB + Redis Stream + Worker
-```
+![Clausewise architecture overview](design_files/images/architecture-overview.svg)
 
 | Component | Path | Role |
 |---|---|---|

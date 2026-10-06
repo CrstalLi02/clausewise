@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1460" viewBox="0 0 2000 1460" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#EA580C"/>
+    </marker>
+    <marker id="arP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7C3AED"/>
+    </marker>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#EC4899" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#EC4899" stop-opacity="0.04"/>
+    </radialGradient>
+    <style>
+      .card { fill: #fff; }
+      .chip { fill: #fff; fill-opacity: 0.18; stroke: #fff; stroke-opacity: 0.45; stroke-width: 1.5; }
+      .lt { font-size: 26px; font-weight: 700; fill: #fff; }
+      .ls { font-size: 17px; fill: #fff; fill-opacity: 0.9; }
+      .ct { font-size: 18px; font-weight: 700; text-anchor: middle; }
+      .cs { font-size: 14px; fill: #64748B; text-anchor: middle; }
+      .wt { font-size: 18px; font-weight: 700; fill: #fff; text-anchor: middle; }
+      .ws { font-size: 14px; fill: #fff; fill-opacity: 0.85; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect width="2000" height="1460" fill="#fff"/>
+  <rect x="36" y="36" width="1928" height="1388" rx="8" fill="#F8FAFC"/>
+
+  <text x="1000" y="100" font-size="38" font-weight="800" fill="#0F172A" text-anchor="middle">Clausewise · System Architecture Overview</text>
+  <text x="1000" y="140" font-size="20" fill="#475569" text-anchor="middle">Five-layer architecture × Self-evolving Loop × Per-department K8s elasticity</text>
+
+  <!-- Users -->
+  <rect x="82" y="202" width="224" height="104" rx="14" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="194" y="246" font-size="21" font-weight="700" fill="#0F172A" text-anchor="middle">Users</text>
+  <text x="194" y="278" font-size="15" fill="#475569" text-anchor="middle">Web / chat bot / mini app</text>
+  <line x1="306" y1="254" x2="362" y2="254" stroke="#475569" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- L1 -->
+  <rect x="368" y="187" width="1174" height="135" rx="16" fill="#6366F1"/>
+  <text class="lt" x="405" y="232">L1 · Access Layer</text>
+  <text class="ls" x="405" y="263">Auth · Rate limit · Routing</text>
+  <g>
+    <rect class="chip" x="660" y="210" width="190" height="84" rx="10"/><text class="wt" x="755" y="245">API Gateway</text><text class="ws" x="755" y="272">Kong / APISIX</text>
+    <rect class="chip" x="875" y="210" width="190" height="84" rx="10"/><text class="wt" x="970" y="245">Auth / RBAC</text><text class="ws" x="970" y="272">JWT · dept scope</text>
+    <rect class="chip" x="1090" y="210" width="190" height="84" rx="10"/><text class="wt" x="1185" y="245">Rate Limit</text><text class="ws" x="1185" y="272">Circuit breaking</text>
+    <rect class="chip" x="1305" y="210" width="210" height="84" rx="10"/><text class="wt" x="1410" y="245">Request Routing</text><text class="ws" x="1410" y="272">By department</text>
+  </g>
+  <line x1="955" y1="322" x2="955" y2="346" stroke="#475569" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- L2 -->
+  <rect x="368" y="352" width="1174" height="210" rx="16" fill="#0EA5E9"/>
+  <text class="lt" x="405" y="397">L2 · Harness Multi-Agent Layer</text>
+  <text class="ls" x="405" y="428">Orchestration · Intent · Retrieval · Generation · Verification</text>
+  <g>
+    <rect class="card" x="398" y="451" width="150" height="88" rx="10"/><text class="ct" x="473" y="487" fill="#0369A1">Orchestrator</text><text class="cs" x="473" y="515">Master scheduler</text>
+    <rect class="card" x="563" y="451" width="150" height="88" rx="10"/><text class="ct" x="638" y="487" fill="#0369A1">Intent</text><text class="cs" x="638" y="515">Intent recognition</text>
+    <rect class="card" x="728" y="451" width="150" height="88" rx="10"/><text class="ct" x="803" y="487" fill="#0369A1">Rewriter</text><text class="cs" x="803" y="515">Query rewriting</text>
+    <rect class="card" x="893" y="451" width="150" height="88" rx="10"/><text class="ct" x="968" y="487" fill="#0369A1">Retrieval</text><text class="cs" x="968" y="515">Hybrid search</text>
+    <rect class="card" x="1058" y="451" width="150" height="88" rx="10"/><text class="ct" x="1133" y="487" fill="#0369A1">Answer</text><text class="cs" x="1133" y="515">Answer generation</text>
+    <rect class="card" x="1223" y="451" width="150" height="88" rx="10"/><text class="ct" x="1298" y="487" fill="#0369A1">Verifier</text><text class="cs" x="1298" y="515">Answer checking</text>
+    <rect class="card" x="1388" y="451" width="140" height="88" rx="10"/><text class="ct" x="1458" y="487" fill="#0369A1">Feedback</text><text class="cs" x="1458" y="515">Signal collection</text>
+  </g>
+  <line x1="955" y1="562" x2="955" y2="587" stroke="#475569" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- L3 -->
+  <rect x="368" y="593" width="1174" height="195" rx="16" fill="#F59E0B"/>
+  <text class="lt" x="405" y="638">L3 · Self-Evolving Loop Layer</text>
+  <text class="ls" x="405" y="668">Execute → Observe → Reflect → Adapt · Feedback-driven Skills / Hooks / Rules</text>
+  <g>
+    <rect class="card" x="398" y="692" width="172" height="74" rx="10"/><text class="ct" x="484" y="724" fill="#B45309">1 Execute</text><text class="cs" x="484" y="749">Answer</text>
+    <rect class="card" x="593" y="692" width="172" height="74" rx="10"/><text class="ct" x="679" y="724" fill="#B45309">2 Observe</text><text class="cs" x="679" y="749">Collect feedback</text>
+    <rect class="card" x="788" y="692" width="172" height="74" rx="10"/><text class="ct" x="874" y="724" fill="#B45309">3 Reflect</text><text class="cs" x="874" y="749">Root-cause analysis</text>
+    <rect class="card" x="983" y="692" width="172" height="74" rx="10"/><text class="ct" x="1069" y="724" fill="#B45309">4 Adapt</text><text class="cs" x="1069" y="749">Update S/H/R</text>
+    <rect class="chip" x="1195" y="692" width="105" height="74" rx="10"/><text class="wt" x="1247" y="726">Skills</text>
+    <rect class="chip" x="1315" y="692" width="105" height="74" rx="10"/><text class="wt" x="1367" y="726">Hooks</text>
+    <rect class="chip" x="1430" y="692" width="96" height="74" rx="10"/><text class="wt" x="1478" y="726">Rules</text>
+  </g>
+  <line x1="955" y1="788" x2="955" y2="813" stroke="#475569" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- L4 -->
+  <rect x="368" y="819" width="1174" height="180" rx="16" fill="#10B981"/>
+  <text class="lt" x="405" y="864">L4 · Data &amp; Retrieval Layer</text>
+  <text class="ls" x="405" y="894">MongoDB persistence · Vector index · Hybrid retrieval · Reranking</text>
+  <g>
+    <rect class="card" x="398" y="917" width="210" height="62" rx="10"/><text class="ct" x="503" y="943" fill="#047857">MongoDB</text><text class="cs" x="503" y="966">Docs / chunks / relations</text>
+    <rect class="card" x="631" y="917" width="210" height="62" rx="10"/><text class="ct" x="736" y="943" fill="#047857">Vector Store</text><text class="cs" x="736" y="966">Chroma / Milvus</text>
+    <rect class="card" x="864" y="917" width="210" height="62" rx="10"/><text class="ct" x="969" y="943" fill="#047857">BM25 + Embedding</text><text class="cs" x="969" y="966">Keyword + semantic</text>
+    <rect class="card" x="1097" y="917" width="210" height="62" rx="10"/><text class="ct" x="1202" y="943" fill="#047857">Reranker</text><text class="cs" x="1202" y="966">bge-reranker</text>
+    <rect class="card" x="1330" y="917" width="196" height="62" rx="10"/><text class="ct" x="1428" y="943" fill="#047857">Glossary</text><text class="cs" x="1428" y="966">Terms / synonyms</text>
+  </g>
+  <line x1="955" y1="999" x2="955" y2="1024" stroke="#475569" stroke-width="2.5" marker-end="url(#ar)"/>
+
+  <!-- L5 -->
+  <rect x="368" y="1030" width="1174" height="180" rx="16" fill="#64748B"/>
+  <text class="lt" x="405" y="1075">L5 · K8s Infrastructure Layer</text>
+  <text class="ls" x="405" y="1105">Independent Deployment per department · HPA autoscaling · Multi-replica HA</text>
+  <g>
+    <rect class="chip" x="398" y="1128" width="144" height="62" rx="10"/><text class="wt" x="470" y="1154">HR</text><text class="ws" x="470" y="1177">HPA 2→20</text>
+    <rect class="chip" x="556" y="1128" width="144" height="62" rx="10"/><text class="wt" x="628" y="1154">Finance</text><text class="ws" x="628" y="1177">HPA 2→15</text>
+    <rect class="chip" x="714" y="1128" width="144" height="62" rx="10"/><text class="wt" x="786" y="1154">Legal</text><text class="ws" x="786" y="1177">HPA 1→8</text>
+    <rect class="chip" x="872" y="1128" width="144" height="62" rx="10"/><text class="wt" x="944" y="1154">IT</text><text class="ws" x="944" y="1177">HPA 1→5</text>
+    <rect class="chip" x="1030" y="1128" width="144" height="62" rx="10"/><text class="wt" x="1102" y="1154">Operations</text><text class="ws" x="1102" y="1177">HPA 1→5</text>
+    <rect class="chip" x="1188" y="1128" width="144" height="62" rx="10"/><text class="wt" x="1260" y="1154">Admin</text><text class="ws" x="1260" y="1177">HPA 1→3</text>
+    <rect class="chip" x="1346" y="1128" width="180" height="62" rx="10"/><text class="wt" x="1436" y="1154">More depts</text><text class="ws" x="1436" y="1177">One-click Helm</text>
+  </g>
+
+  <!-- Loop orb -->
+  <circle cx="1738" cy="593" r="150" fill="url(#glow)"/>
+  <circle cx="1738" cy="593" r="86" fill="#EC4899"/>
+  <text x="1738" y="582" font-size="28" font-weight="800" fill="#fff" text-anchor="middle">LOOP</text>
+  <text x="1738" y="610" font-size="15" fill="#fff" text-anchor="middle">Feedback-driven</text>
+  <text x="1738" y="630" font-size="15" fill="#fff" text-anchor="middle">evolution</text>
+  <path d="M1544 548 H1650" stroke="#EA580C" stroke-width="2.5" stroke-dasharray="7 6" fill="none" marker-end="url(#arO)"/>
+  <text x="1598" y="534" font-size="14" fill="#EA580C" text-anchor="middle">Feedback signals</text>
+  <path d="M1660 638 H1550" stroke="#7C3AED" stroke-width="2.5" stroke-dasharray="7 6" fill="none" marker-end="url(#arP)"/>
+  <text x="1610" y="662" font-size="14" fill="#7C3AED" text-anchor="middle">S/H/R injection</text>
+  <path d="M1544 712 C1640 712 1700 750 1700 812" stroke="#64748B" stroke-width="2" stroke-dasharray="5 6" fill="none" marker-end="url(#ar)"/>
+  <text x="1596" y="700" font-size="14" fill="#475569" text-anchor="middle">Read/write</text>
+
+  <!-- Memory panel -->
+  <rect x="1618" y="820" width="300" height="390" rx="16" fill="#fff" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="1768" y="862" font-size="21" font-weight="700" fill="#0F172A" text-anchor="middle">Four-Layer Memory</text>
+  <line x1="1648" y1="878" x2="1888" y2="878" stroke="#E2E8F0" stroke-width="2"/>
+  <rect x="1648" y="895" width="240" height="62" rx="10" fill="#EEF2FF"/><text x="1768" y="921" font-size="17" font-weight="700" fill="#4F46E5" text-anchor="middle">Working memory</text><text x="1768" y="944" font-size="13" fill="#6366F1" text-anchor="middle">Redis · session context</text>
+  <rect x="1648" y="970" width="240" height="62" rx="10" fill="#FEF9C3"/><text x="1768" y="996" font-size="17" font-weight="700" fill="#A16207" text-anchor="middle">User memory</text><text x="1768" y="1019" font-size="13" fill="#A16207" text-anchor="middle">Profile · preferences · history</text>
+  <rect x="1648" y="1045" width="240" height="62" rx="10" fill="#DCFCE7"/><text x="1768" y="1071" font-size="17" font-weight="700" fill="#15803D" text-anchor="middle">Department memory</text><text x="1768" y="1094" font-size="13" fill="#15803D" text-anchor="middle">FAQ · Skills · terms</text>
+  <rect x="1648" y="1120" width="240" height="62" rx="10" fill="#F3E8FF"/><text x="1768" y="1146" font-size="17" font-weight="700" fill="#7E22CE" text-anchor="middle">Global memory</text><text x="1768" y="1169" font-size="13" fill="#7E22CE" text-anchor="middle">Shared knowledge · calendar</text>
+
+  <!-- Footer -->
+  <text x="1000" y="1280" font-size="17" fill="#64748B" text-anchor="middle">Main path (solid): user request → L1 → L2 → L3 → L4 → L5 data access → answer returned layer by layer</text>
+  <text x="1000" y="1312" font-size="17" fill="#64748B" text-anchor="middle">Feedback loop (dashed): Feedback Agent collects signals → Loop Engine analyzes → updates Skills/Hooks/Rules → feeds back into agent behavior</text>
+  <text x="1000" y="1360" font-size="18" font-weight="700" fill="#334155" text-anchor="middle">Highlights: self-evolving Loop · per-department K8s elasticity · layered memory · Verifier-enforced anti-hallucination</text>
+</svg>

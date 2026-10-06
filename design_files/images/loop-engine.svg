@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="740" viewBox="0 0 1700 740" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#111" stroke-width="1.6"/>
+    </marker>
+  </defs>
+  <rect width="1700" height="740" fill="#fff"/>
+  <rect x="50" y="50" width="1595" height="633" rx="16" fill="none" stroke="#111" stroke-width="3"/>
+  <text x="848" y="118" font-size="46" text-anchor="middle" fill="#111">Loop Engineering Steps</text>
+
+  <g font-size="34" text-anchor="middle">
+    <rect x="127" y="172" width="236" height="156" rx="12" fill="#E0F5E6" stroke="#111" stroke-width="3"/>
+    <text x="245" y="240" fill="#111">Execute</text>
+    <text x="245" y="288" font-size="28" fill="#333">Answer users</text>
+
+    <rect x="728" y="172" width="236" height="156" rx="12" fill="#FDF1CC" stroke="#111" stroke-width="3"/>
+    <text x="846" y="240" fill="#111">Observe</text>
+    <text x="846" y="288" font-size="28" fill="#333">Collect feedback</text>
+
+    <rect x="1330" y="172" width="236" height="156" rx="12" fill="#E8E2FD" stroke="#111" stroke-width="3"/>
+    <text x="1448" y="240" fill="#111">Reflect</text>
+    <text x="1448" y="288" font-size="28" fill="#333">Find root causes</text>
+
+    <rect x="1330" y="482" width="236" height="156" rx="12" fill="#A8BCE3" stroke="#3A4A6B" stroke-width="3"/>
+    <text x="1448" y="550" fill="#fff">Adapt</text>
+    <text x="1448" y="598" font-size="28" fill="#fff">Update policies</text>
+
+    <rect x="127" y="482" width="236" height="156" rx="12" fill="#F3F3F3" stroke="#111" stroke-width="3"/>
+    <text x="245" y="550" fill="#111">Deploy</text>
+    <text x="245" y="598" font-size="28" fill="#333">Canary release</text>
+  </g>
+
+  <g stroke="#111" stroke-width="3" fill="none" marker-end="url(#arrow)">
+    <line x1="372" y1="250" x2="718" y2="250"/>
+    <line x1="974" y1="250" x2="1320" y2="250"/>
+    <line x1="1448" y1="338" x2="1448" y2="472"/>
+    <line x1="1320" y1="560" x2="373" y2="560"/>
+    <line x1="245" y1="472" x2="245" y2="338"/>
+  </g>
+</svg>

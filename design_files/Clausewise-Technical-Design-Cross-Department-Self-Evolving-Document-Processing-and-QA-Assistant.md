@@ -56,7 +56,7 @@ No dependency on code-heavy frameworks such as LangChain/AutoGen. Agent collabor
 
 ### 2.1 Core Architecture Diagram
 
-![System architecture overview](images/architecture-overview.png)
+![System architecture overview](images/architecture-overview.svg)
 
 ### 2.2 Five-Layer Architecture
 
@@ -243,7 +243,7 @@ The system runs fully automatically within the defined scope; humans only set bo
 
 ### 4.3 The Loop Engine Core Cycle
 
-![Loop Engine five-step flow](images/loop-engine.png)
+![Loop Engine five-step flow](images/loop-engine.svg)
 
 **The five stages in detail**:
 
@@ -463,7 +463,7 @@ The memory system is the "glue" of multi-agent collaboration, organized in four 
 
 **Core idea**: each department's agent stack (Intent + Retrieval + Answer + Verifier) is an independent Deployment that scales automatically on QPS via HPA; the Orchestrator and Loop Engine are deployed independently as global services. Resources are isolated between departments, so high-traffic departments (e.g., Academic Affairs at the start of semester) cannot starve others.
 
-![K8s multi-department deployment architecture](images/k8s-deployment.png)
+![K8s multi-department deployment architecture](images/k8s-deployment.svg)
 
 ### 7.2 Department Agent Pod Design
 
