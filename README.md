@@ -6,56 +6,13 @@ It covers the full loop of **"document ingestion → intelligent Q&A → self-ev
 
 ## Key Features
 
-### 📄 Document Ingestion Pipeline
-- **Multi-format parsing**: PDF (pdfplumber, falling back to pypdf), DOCX (paragraphs and tables), Markdown, HTML, and TXT, preserving heading hierarchy, lists, and tables.
-- **Async processing**: uploads return immediately; a Redis Stream worker runs the pipeline, and the UI polls job status (`queued → running → completed/failed`).
-- **Clause-level chunking**: splits along Chapter / Section / Article boundaries instead of fixed token windows (target 300–600 characters), so every answer can be traced to a specific clause.
-- **Cleaning and metadata**: removes page numbers, headers, and watermarks; the LLM extracts effective date, document type, keywords, applicable audience, and cross-references.
-- **Versioning and deduplication**: identical files are rejected; a new file with the same title becomes a new version linked by `supersedes`, and the old version is archived only after the new one is fully indexed (fail-safe, with cleanup on failure).
-- **Cross-department conflict detection**: on ingestion, reference patterns are mined by regex and similar clauses from other departments are compared semantically, with the LLM judging real contradictions (e.g., two departments giving different deadlines for the same matter).
-
-### 💬 Trusted Q&A
-- **Automatic department routing**: explainable keyword matching → LLM semantic routing → fall back to all departments; the answer shows which department was chosen and why.
-- **Multi-agent fixed DAG**: Intent → Query Rewrite (glossary synonyms, multiple queries) → Retrieval → Answer → Verifier, with no LangChain/AutoGen dependency.
-- **Hybrid retrieval**: BM25 keywords + vector semantics fused with RRF, reranked by `bge-reranker-v2-m3`; hits are re-read from MongoDB and filtered to active documents only.
-- **Citations and anti-hallucination**: every key conclusion is marked `[Source N]` and linked to the document, section, and original text; when nothing is found, the system says no explicit provision exists instead of guessing.
-- **Independent verification**: the Verifier checks grounding, contradictions, omissions, and citation format, and sends answers back for rewriting up to 2 times.
-- **Cross-department collaboration**: questions spanning departments are sent to department agents in parallel; partial success is allowed and degraded departments are reported.
-- **Multi-turn context**: follow-up questions such as "and when is it due?" are resolved from the session summary and entities.
-
-### 🧠 Governed Memory
-- **One fact plane + five memory planes**: session working memory (Redis, 30-minute TTL), episodic memory, user semantic memory, organizational knowledge memory, and procedural learning memory (Skills/Hooks/Rules/experiments).
-- **Facts always win**: only active official documents can be cited; organizational FAQs must be bound to a source chunk and version, and become stale automatically when that document is archived or replaced.
-- **Privacy by design**: long-term user memory requires explicit consent, sensitive fields (ID numbers, passwords, health, financial details, etc.) are rejected, inferred preferences only become pending candidates, and users can view and delete their own memory.
-- **Auditing**: every memory used in an answer is recorded in `memory_usage`, and writes/deletions in `memory_audit`.
-
-### 🔁 Self-Evolving Loop
-- **Five-stage cycle**: Execute (record full traces) → Observe (explicit 👍/👎/corrections, implicit copy/follow-up/abandon, Verifier signals) → Reflect (root cause: retrieval / intent / generation / knowledge gap) → Adapt (generate Skill/Hook/Rule candidates) → Deploy.
-- **Skills that actually change behavior**: a matched Skill expands the retrieval query, raises top-k, injects an output template, or adds calendar constraints — it is not just extra prompt text. Three executable baseline Skills ship by default, and the Skill Miner clusters frequent questions (DBSCAN) to propose new ones.
-- **Safe rollout**: stable-hash treatment/control bucketing, versioned policy snapshots, same-question replay of baseline vs. candidate, and automatic rollback when the treatment underperforms.
-- **Lifecycle management**: rarely used or low-success Skills are marked stale, superseded ones deprecated, and heavily overlapping Skills get merge proposals.
-- **Mutable scope**: thresholds, weights, and triggers can change automatically, while Skill logic and rule content require human review.
-
-### 👥 Human-in-the-Loop Review
-- **Auto-generated tests**: each new document produces test questions that the system answers itself; department admins judge every answer and can submit corrections.
-- **Progressive exit**: departments move from human-in-the-loop → human-on-the-loop → human-out-of-the-loop once accuracy ≥ 80% over at least 5 samples (configurable).
-- **Spot checks**: out-of-the-loop departments are still sampled, and any error rolls them back to human-on-the-loop.
-
-### 🛡️ Roles and Security
-- **Three roles**: end user (Q&A, citations, history, personal memory), department admin (own department only), and super admin (global Loop, policies, all departments).
-- **Strict isolation**: HMAC tokens with expiry; identity comes only from the token; sessions, feedback, and memory check ownership; department data is isolated on the backend.
-- **Hardened internals**: internal endpoints require a shared token and fail closed; login rate limiting; upload type and size limits; pi agents only get the tools Python explicitly allows.
-
-### 📊 Admin Console
-Six panels: **Overview** (phase and accuracy per department), **Knowledge Assets** (departments, uploads, pipeline stages), **Trusted Review** (per-question review), **Evolution Loop** (live job tracking, structured reports, Skills/Hooks/Rules), **Memory & Experiments** (memory planes, fact plane, canary traffic, feedback radar), and **Agent Network** (per-department agent stacks).
-
-### ☸️ Deployment, Scaling, and Resilience
-- **Per-department elasticity**: each department agent is its own Deployment + HPA, scaled on the `clausewise_dept_agent_inflight` metric via the Prometheus Adapter (e.g., 1 replica for quiet departments, up to 20 for busy ones).
-- **One-command local stack**: Docker Compose for MongoDB, Redis, backend, worker, pi agent, and web; Kubernetes manifests and a Helm chart for production.
-- **Graceful degradation**: pi Runtime → local Python LLM → keyword/heuristic fallbacks, so the system keeps answering even when models are unavailable.
-- **Observability**: Prometheus metrics for latency, retrieval hits, adoption, Skill triggers, and pi execution status.
-
-> **Current limitations**: the full conflict review → notification → resolution workflow, OCR for scanned PDFs, statistical significance testing for experiments, circuit breakers/DLQ, and a real 1 → 20 Pod load-test report are not yet complete.
+- **Document ingestion**: async parsing of PDF/DOCX/Markdown/HTML/TXT, clause-level chunking, version chains, and automatic cross-department conflict detection.
+- **Trusted Q&A**: automatic department routing, hybrid BM25 + vector retrieval with reranking, `[Source N]` citations, and an independent Verifier that rejects unsupported answers.
+- **Governed memory**: one authoritative fact plane plus five memory planes, with consent, sensitive-data filtering, and auditing.
+- **Self-evolving Loop**: feedback becomes Skills/Hooks/Rules that change retrieval and answers, rolled out via canary experiments with automatic rollback.
+- **Human review**: auto-generated test questions per document; departments exit human review once accuracy stays above the threshold, with spot checks.
+- **Roles and security**: user / department admin / super admin, token-based identity, and strict per-department data isolation.
+- **Scaling**: each department agent scales independently on Kubernetes (HPA), with graceful fallbacks when models are unavailable.
 
 > For the detailed technical design, see [`design_files/Clausewise-Technical-Design-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md`](design_files/Clausewise-Technical-Design-Cross-Department-Self-Evolving-Document-Processing-and-QA-Assistant.md)
 
